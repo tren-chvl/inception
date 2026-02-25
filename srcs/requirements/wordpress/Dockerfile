@@ -24,6 +24,9 @@ RUN curl -O https://wordpress.org/latest.tar.gz && \
     tar -xzf latest.tar.gz --strip-components=1 && \
     rm latest.tar.gz
 
+# 🔥 Correction ici
+RUN sed -i "s|listen = 127.0.0.1:9000|listen = 9000|" /etc/php81/php-fpm.d/www.conf
+
 COPY tools/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
@@ -31,3 +34,4 @@ EXPOSE 9000
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["php-fpm81", "-F"]
+
