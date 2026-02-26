@@ -4,6 +4,8 @@ RUN apk update && apk add --no-cache \
     nginx \
     openssl
 
+RUN rm -rf /etc/nginx/conf.d/*
+
 RUN mkdir -p /etc/nginx/ssl /var/www/html /run/nginx
 
 RUN openssl req -x509 -nodes -days 365 \

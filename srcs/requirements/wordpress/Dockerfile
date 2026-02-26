@@ -1,5 +1,6 @@
 FROM alpine:3.19
 
+# Installation PHP 8.1 + extensions + mysql-client
 RUN apk update && apk add --no-cache \
     php81 \
     php81-fpm \
@@ -15,18 +16,22 @@ RUN apk update && apk add --no-cache \
     php81-zip \
     php81-phar \
     php81-session \
-    curl
+    curl \
+    mysql-client
 
+# Répertoire WordPress
 RUN mkdir -p /var/www/html
 WORKDIR /var/www/html
 
+# Téléchargement WordPress
 RUN curl -O https://wordpress.org/latest.tar.gz && \
     tar -xzf latest.tar.gz --strip-components=1 && \
     rm latest.tar.gz
 
-# 🔥 Correction ici
+# Configuration PHP-FPM pour écouter sur 9000
 RUN sed -i "s|listen = 127.0.0.1:9000|listen = 9000|" /etc/php81/php-fpm.d/www.conf
 
+# Ajout de l'entrypoint
 COPY tools/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 

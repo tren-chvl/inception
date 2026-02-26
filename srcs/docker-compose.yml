@@ -3,23 +3,24 @@ version: '3.9'
 services:
   nginx:
     build: ./requirements/nginx
-    image: srcs-nginx
+    image: nginx
     container_name: nginx
     ports:
       - "443:443"
     volumes:
       - wp_data:/var/www/html
       - ./requirements/nginx/conf/nginx.conf:/etc/nginx/nginx.conf
-      - ./requirements/nginx/conf/default.conf:/etc/nginx/conf.d/default.conf
     networks:
       - inception
     depends_on:
       - wordpress
     restart: always
+    env_file:
+      - .env
 
   wordpress:
     build: ./requirements/wordpress
-    image: srcs-wordpress
+    image: wordpress
     container_name: wordpress
     volumes:
       - wp_data:/var/www/html
@@ -30,15 +31,22 @@ services:
     restart: always
     secrets:
       - db_password
+      - wp_admin_password
     environment:
-      MYSQL_DATABASE: marcheva_db
-      MYSQL_USER: marcheva
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD_FILE: /run/secrets/db_password
       MYSQL_HOST: mariadb
+      WP_TITLE: ${WP_TITLE}
+      WP_ADMIN_USER: ${WP_ADMIN_USER}
+      WP_ADMIN_EMAIL: ${WP_ADMIN_EMAIL}
+      WP_ADMIN_PASSWORD_FILE: /run/secrets/wp_admin_password
+    env_file:
+      - .env
 
   mariadb:
     build: ./requirements/mariadb
-    image: srcs-mariadb   # ⭐ OBLIGATOIRE
+    image: mariadb
     container_name: mariadb
     volumes:
       - db_data:/var/lib/mysql
@@ -49,10 +57,12 @@ services:
       - db_password
       - db_root_password
     environment:
-      MYSQL_DATABASE: marcheva_db
-      MYSQL_USER: marcheva
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD_FILE: /run/secrets/db_password
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+    env_file:
+      - .env
 
 volumes:
   wp_data:
@@ -78,4 +88,6 @@ secrets:
     file: ../secrets/db_password.txt
   db_root_password:
     file: ../secrets/db_root_password.txt
+  wp_admin_password:
+    file: ../secrets/wp_admin_password.txt
 
