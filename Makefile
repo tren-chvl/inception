@@ -25,3 +25,6 @@ fclean: clean
 	sudo find $(DB_DIR) -mindepth 1 -delete
 
 re: fclean up
+
+.PHONY: all up down clean fclean re
+
